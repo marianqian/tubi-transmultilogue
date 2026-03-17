@@ -50,7 +50,7 @@ TransMultilogue improves multimodal sentiment analysis by fusing **Multilogue-Ne
 This project was completed with my partner Michelle. I list our contributions separately below.
 
 My contributions (Marian): 
-- Modified a **small part of the Gated-Multilogue-Net class** in [model.py](https://github.com/marianqian/tubi-transmultilogue/blob/main/transformer/model.py#L184-L284).  
+- Modified a **small part of the Gated-Multilogue-Net class** in [model.py](https://github.com/marianqian/tubi-transmultilogue/blob/main/transformer/model.py#L184-L284) (lines 184–284). 
   - Added reasoning and documented **key design choices** for improved modality fusion and context representation.  
   - Implemented the **TransMultilogue pipeline** combining GRUs and pretrained transformer embeddings.  
 - Ran experiments for the transformer implementation.  
@@ -66,6 +66,23 @@ Michelle's contributions:
 - **Concatenation of emotion vectors as transformer input:** Lightweight alternative to full modality fusion.  
 - **MLP for regression:** Maps fused features to target sentiment outputs.  
 - **Gating modification:** Balances modalities for improved context representation; fully documented with rationale.  
+
+---
+
+## Approach & Tradeoffs
+Our approach integrates **Multilogue-Net GRUs** with a **pretrained transformer** to combine temporal modeling of each modality with pretrained textual knowledge.  
+
+**Pipeline:**
+1. Input modalities pass through dedicated GRUs for **emotion, context, and state**.  
+2. **Concatenate emotion vectors** from all modalities and feed into a **pretrained Reformer transformer** (~3M parameters).  
+3. Transformer output is combined with original GRU emotion states.  
+4. Pass through an **MLP** to predict sentiment.  
+
+**Tradeoffs and design decisions:**
+- We **did not use full pretrained modality fusion** (injecting audio/video features into transformer layers like UniMSE) due to **resource constraints**, choosing concatenation as a lightweight alternative.  
+- Used a **smaller Reformer transformer** trained only on *Crime and Punishment*, trading computational feasibility for potential loss in textual representation richness.  
+- **Current timestep-only transformer usage:** Did not propagate hidden states across timesteps, which could limit context capture.  
+- Gating modification in GRU class was introduced to balance modalities for improved context representation, without affecting base model integrity.  
 
 ---
 
